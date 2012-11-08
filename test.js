@@ -1,7 +1,7 @@
 var MemoryTree = require('./memory')
 
-var a = { a: {}, b: {} };
-a = new MemoryTree(a);
+var a = { a: {}, b: {} }
+a = new MemoryTree(a)
 
 a.set('a.b', 7)
 .set('b.b', 9)
@@ -14,17 +14,17 @@ console.log(a.value)
 print(a.tnext.value)
 console.log(a.value)
 function print(obj, sp) {
-  sp = sp || '';
-  var delim = '';
+  sp = sp || ''
+  var delim = ''
   if ( typeof obj == 'object') {
     process.stdout.write(sp + '{ ')
     for(var i in obj) {
-      process.stdout.write(sp + delim + i + ':'); 
+      process.stdout.write(sp + delim + i + ':') 
       if (typeof obj[i] == 'object') process.stdout.write('\n')
-      print(obj[i], sp + '  ');
-      delim = ', ';
+      print(obj[i], sp + '  ')
+      delim = ', '
     }
     console.log(sp + '}')
   }
-  else console.log(sp + obj);
+  else console.log(sp + obj)
 }
