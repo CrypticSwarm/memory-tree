@@ -1,0 +1,19 @@
+{
+  "author": "Cryptic Swarm <crypticswarm@gmail.com> (http://crypticswarm.com)",
+  "name": "memory-tree",
+  "description": "An immutable data-structure inspired by vim's undo history.",
+  "version": "0.0.1",
+  "homepage": "https://github.com/CrypticSwarm/memory-tree",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/CrypticSwarm/memory-tree.git"
+  },
+  "main": "memory.js",
+  "scripts": { "test": "tap test/*.js" },
+  "engines": {
+    "node": "~0.8.9"
+  },
+  "dependencies": {},
+  "devDependencies": { "tap": "~0.2.3" },
+  "optionalDependencies": {}
+}
