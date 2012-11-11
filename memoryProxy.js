@@ -7,9 +7,6 @@ function getSha(data) {
   return h.digest('hex')
 }
 
-// need to be able to Ref() -> get sha
-// reset -> set proxy to sha
-
 function wrapObj(parent, x) {
   var handler = {
     get: function(receiver, name) {
@@ -165,6 +162,11 @@ function createScopeObject(initialObject, parentScopeInfo) {
     varDiffMeta.setSha(curObj.diffVar)
     return true
   }
+
+  emitter.__defineSetter__('viewAll', function (val) {
+    varDiffMeta.viewAll = val
+    return true
+  })
 
   return [varDiff, emitter]
 }

@@ -50,4 +50,10 @@ child.c.d.f = 52
 console.log('---')
 console.log(glob)
 console.log(child)
+childInfo[1].viewAll = true
+globScopeInfo[1].viewAll = true
+console.log(glob)
+console.log(child)
+childInfo[1].viewAll = false
+globScopeInfo[1].viewAll = false
 console.log(childInfo[1].getSha())
