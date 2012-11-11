@@ -39,6 +39,7 @@ console.log('---')
 console.log(glob)
 console.log(child)
 console.log(childInfo[1].getSha())
+var first = childInfo[1].getSha()
 
 child.x = 7
 console.log('---')
@@ -54,6 +55,19 @@ childInfo[1].viewAll = true
 globScopeInfo[1].viewAll = true
 console.log(glob)
 console.log(child)
-childInfo[1].viewAll = false
-globScopeInfo[1].viewAll = false
 console.log(childInfo[1].getSha())
+var last = childInfo[1].getSha()
+
+console.log('---')
+console.log(first)
+childInfo[1].setSha(first)
+console.log(glob)
+console.log(child)
+
+child.a = 55
+
+console.log('---')
+console.log(last)
+childInfo[1].setSha(last)
+console.log(glob)
+console.log(child)

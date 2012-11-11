@@ -116,9 +116,8 @@ function createScopeObject(initialObject, parentScopeInfo) {
   var set = varDiffMeta.handler.set
   var shaList = {}
   var curSha
-  var curObj = setObject(parentScopeMeta.getSha(), varDiffMeta.getSha())
-
-  shaList[curSha] = curObj
+  var curObj
+  setObject(parentScopeMeta.getSha(), varDiffMeta.getSha())
 
   parentScopeMeta.on('change', objChange)
   varDiffMeta.on('change', objChange)
@@ -126,9 +125,9 @@ function createScopeObject(initialObject, parentScopeInfo) {
   function setObject(parent, diff) {
     var sha = getObjSha(parent, diff)
     curSha = sha
-    if (shaList[sha]) curObj = shaList[sha] 
     curObj = { parentScope: parent, diffVar: diff }
-    shaList[sha] = curObj
+    if (shaList[sha]) curObj = shaList[sha]
+    else shaList[sha] = curObj
     emitter.emit('change', curObj, curSha)
   }
 
