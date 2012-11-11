@@ -1,16 +1,11 @@
 var crypto = require('crypto')
 var EventEmitter = require('events').EventEmitter
 
-function getSha(parent, obj) {
-  var oldJSON = Function.prototype.toJSON 
-  Function.prototype.toJSON = function () { return this + '' }
+function getSha(data) {
   var h = crypto.createHash('sha1')
-  if (parent != null) h.update(parent)
-  h.update(JSON.stringify(obj))
-  Function.prototype.toJSON = oldJSON
+  h.update(data)
   return h.digest('hex')
 }
-
 
 // need to be able to Ref() -> get sha
 // reset -> set proxy to sha
@@ -59,9 +54,18 @@ function wrapObj(parent, x) {
   var emitter = new EventEmitter()
   var shaList = {}
   var objList = new WeakMap()
-  var curSha = getSha(parent, x)
+  var curSha = getSha(parent + JSON.stringify(x))
   var curObj = x
+  shaList[curSha] = curObj
+  function getObjSha(obj) {
+    var oldJSON = Function.prototype.toJSON
+    Function.prototype.toJSON = function () { return this + '' }
+    var sha = getSha(curSha + JSON.stringify(obj))
+    Function.prototype.toJSON = oldJSON
+    return sha
+  }
 
+  emitter.handler = handler
   emitter.getSha = function getSha() {
     return curSha
   }
@@ -72,11 +76,11 @@ function wrapObj(parent, x) {
     curObj = shaList[sha]
     return true
   }
-  
+
   function setObject(name, val) {
     var newObj = Object.create(curObj)
     newObj[name] = val
-    var sha = getSha(curSha, newObj)
+    var sha = getObjSha(curSha, newObj)
     curSha = sha
     if (shaList[sha]) {
       curObj = shaList[sha]
@@ -103,4 +107,67 @@ function createMemProxy(initialObject) {
   return wrapObj(null, initialObject)
 }
 
+
+function createScopeObject(initialObject, parentScopeInfo) {
+  var varDiffInfo = createMemProxy(initialObject)
+  var parentScope = parentScopeInfo[0]
+  var parentScopeMeta = parentScopeInfo[1]
+  var emitter = new EventEmitter()
+  var varDiff = varDiffInfo[0]
+  var varDiffMeta = varDiffInfo[1]
+  var get = varDiffMeta.handler.get
+  var set = varDiffMeta.handler.set
+  var shaList = {}
+  var curSha
+  var curObj = setObject(parentScopeMeta.getSha(), varDiffMeta.getSha())
+
+  shaList[curSha] = curObj
+
+  parentScopeMeta.on('change', objChange)
+  varDiffMeta.on('change', objChange)
+
+  function setObject(parent, diff) {
+    var sha = getObjSha(parent, diff)
+    curSha = sha
+    if (shaList[sha]) curObj = shaList[sha] 
+    curObj = { parentScope: parent, diffVar: diff }
+    shaList[sha] = curObj
+    emitter.emit('change', curObj, curSha)
+  }
+
+  function getObjSha(parent, diff) {
+    return getSha(parent + diff)
+  }
+
+  function objChange() {
+    return setObject(parentScopeMeta.getSha(), varDiffMeta.getSha())
+  }
+
+  varDiffMeta.handler.set = function setTrap(receiver, name, val) {
+    if (Object.hasOwnProperty.call(initialObject, name)) return set.apply(this, arguments)
+    else return parentScope[name] = val
+  }
+
+  varDiffMeta.handler.get = function getTrap(receiver, name) {
+    if (Object.hasOwnProperty.call(initialObject, name)) return get.apply(this, arguments)
+    else return parentScope[name]
+  }
+
+  emitter.getSha = function getSha() {
+    return curSha
+  }
+
+  emitter.setSha = function setSha(sha) {
+    if (!shaList[sha]) return false
+    curSha = sha
+    curObj = shaList[sha]
+    parentScopeMeta.setSha(curObj.parentScope)
+    varDiffMeta.setSha(curObj.diffVar)
+    return true
+  }
+
+  return [varDiff, emitter]
+}
+
 module.exports = createMemProxy
+createMemProxy.Scope = createScopeObject

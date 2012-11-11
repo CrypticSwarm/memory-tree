@@ -30,4 +30,24 @@ console.log(obj)
 mem[1].setSha(oldRef)
 console.log(obj)
 
+var globScopeInfo = Memory.Scope({ a: 1, b: 2, c: { d: {} } }, Memory({}))
+var glob = globScopeInfo[0]
+var childInfo = Memory.Scope({ x: 1, y: 2 }, globScopeInfo)
+var child = childInfo[0]
 
+console.log('---')
+console.log(glob)
+console.log(child)
+console.log(childInfo[1].getSha())
+
+child.x = 7
+console.log('---')
+console.log(glob)
+console.log(child)
+console.log(childInfo[1].getSha())
+
+child.c.d.f = 52
+console.log('---')
+console.log(glob)
+console.log(child)
+console.log(childInfo[1].getSha())
