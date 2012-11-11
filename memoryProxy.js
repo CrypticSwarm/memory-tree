@@ -71,13 +71,14 @@ function wrapObj(parent, x) {
     if (!shaList[sha]) return false
     curSha = sha
     curObj = shaList[sha]
+    emitter.emit('change', curObj, curSha)
     return true
   }
 
   function setObject(name, val) {
     var newObj = Object.create(curObj)
     newObj[name] = val
-    var sha = getObjSha(curSha, newObj)
+    var sha = getObjSha(newObj)
     curSha = sha
     if (shaList[sha]) {
       curObj = shaList[sha]
@@ -90,7 +91,7 @@ function wrapObj(parent, x) {
   }
 
   function getWrappedObject(obj, name) {
-    if (objList.has(obj)) return objList.get(obj)
+    if (objList.has(obj)) return objList.get(obj)[0]
     var wrapped = wrapObj(curSha, obj)
     objList.set(obj, wrapped)
     wrapped[1].on('change', setObject.bind(null, name))
@@ -125,9 +126,11 @@ function createScopeObject(initialObject, parentScopeInfo) {
   function setObject(parent, diff) {
     var sha = getObjSha(parent, diff)
     curSha = sha
-    curObj = { parentScope: parent, diffVar: diff }
     if (shaList[sha]) curObj = shaList[sha]
-    else shaList[sha] = curObj
+    else {
+      curObj = { parentScope: parent, diffVar: diff }
+      shaList[sha] = curObj
+    }
     emitter.emit('change', curObj, curSha)
   }
 
@@ -156,9 +159,10 @@ function createScopeObject(initialObject, parentScopeInfo) {
   emitter.setSha = function setSha(sha) {
     if (!shaList[sha]) return false
     curSha = sha
-    curObj = shaList[sha]
-    parentScopeMeta.setSha(curObj.parentScope)
-    varDiffMeta.setSha(curObj.diffVar)
+    var obj = curObj = shaList[sha]
+    parentScopeMeta.setSha(obj.parentScope)
+    varDiffMeta.setSha(obj.diffVar)
+    emitter.emit('change', curObj, curSha)
     return true
   }
 

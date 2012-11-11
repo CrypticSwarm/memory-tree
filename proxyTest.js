@@ -46,6 +46,8 @@ console.log('---')
 console.log(glob)
 console.log(child)
 console.log(childInfo[1].getSha())
+var secondLast = childInfo[1].getSha()
+var secondLastGob = globScopeInfo[1].getSha()
 
 child.c.d.f = 52
 console.log('---')
@@ -57,6 +59,7 @@ console.log(glob)
 console.log(child)
 console.log(childInfo[1].getSha())
 var last = childInfo[1].getSha()
+console.log(last === secondLast, last, secondLast)
 
 console.log('---')
 console.log(first)
@@ -66,8 +69,14 @@ console.log(child)
 
 child.a = 55
 
-console.log('---')
-console.log(last)
-childInfo[1].setSha(last)
+console.log('--->>>>')
+childInfo[1].setSha(secondLast)
+console.log('secondLastGlobSha ->', secondLastGob, globScopeInfo[1].getSha())
+console.log('secondLastSha ->', secondLast, childInfo[1].getSha(), last)
+console.log('--->>>>')
+child.c.d.f = 52
 console.log(glob)
 console.log(child)
+console.log(last)
+console.log(childInfo[1].getSha())
+console.log('same change at secondLast yields same as last ->', last === childInfo[1].getSha())
