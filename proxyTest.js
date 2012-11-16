@@ -80,3 +80,8 @@ console.log(child)
 console.log(last)
 console.log(childInfo[1].getSha())
 console.log('same change at secondLast yields same as last ->', last === childInfo[1].getSha())
+
+var grandChildInfo = Memory.Scope({ h: 95, d: 43, c: 0, this: {}, arguments: [] }, childInfo)
+var grandChild = grandChildInfo[0]
+console.log((grandChild))
+

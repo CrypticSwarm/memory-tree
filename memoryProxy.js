@@ -10,6 +10,7 @@ function getSha(data) {
 function wrapObj(parent, x) {
   var handler = {
     get: function(receiver, name) {
+      if (name === 'toJSON') return function() { return JSON.stringify(curObj) }
       var x = curObj[name]
       if (x == null) return x
       if (typeof x === 'object') return getWrappedObject(x, name)
@@ -21,6 +22,9 @@ function wrapObj(parent, x) {
       return true
     },
     getOwnPropertyDescriptor: function (name) {
+      return handler.getPropertyDescriptor(name)
+    },
+    getPropertyDescriptor: function (name) {
       var obj = curObj
       var desc
       while(obj) {
@@ -33,6 +37,9 @@ function wrapObj(parent, x) {
       return desc;
     },
     getOwnPropertyNames: function() {
+      return handler.getPropertyNames()
+    },
+    getPropertyNames: function() {
       return Object.getOwnPropertyNames(obj);
     },
     enumerate: function() {
@@ -47,6 +54,7 @@ function wrapObj(parent, x) {
       return result
     }
   }
+
   var proxy = Proxy.create(handler)
   var emitter = new EventEmitter()
   var shaList = {}
