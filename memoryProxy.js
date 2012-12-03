@@ -174,6 +174,9 @@ function createScopeObject(initialObject, parentScopeInfo) {
     return true
   }
 
+  emitter.parentScope = parentScopeInfo[1]
+  emitter.scope = varDiff
+
   emitter.__defineSetter__('viewAll', function (val) {
     varDiffMeta.viewAll = val
     return true
