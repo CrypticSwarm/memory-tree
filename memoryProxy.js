@@ -28,19 +28,19 @@ function wrapObj(parent, x) {
       var obj = curObj
       var desc
       while(obj) {
-        desc = Object.getOwnPropertyDescriptor(obj, name);
+        desc = Object.getOwnPropertyDescriptor(obj, name)
         if (desc) obj = null
         else obj = obj.__proto__
       }
       // a trapping proxy's properties must always be configurable
-      if (desc !== undefined) { desc.configurable = true; }
-      return desc;
+      if (desc !== undefined) { desc.configurable = true }
+      return desc
     },
     getOwnPropertyNames: function() {
       return handler.getPropertyNames()
     },
     getPropertyNames: function() {
-      return Object.getOwnPropertyNames(obj);
+      return Object.getOwnPropertyNames(obj)
     },
     enumerate: function() {
       var result = []
