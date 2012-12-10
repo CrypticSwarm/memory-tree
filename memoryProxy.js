@@ -114,7 +114,7 @@ function createMemProxy(initialObject) {
 }
 
 
-function createScopeObject(initialObject, parentScopeInfo) {
+function createMemoryScope(initialObject, parentScopeInfo) {
   var varDiffInfo = createMemProxy(initialObject)
   var parentScope = parentScopeInfo[0]
   var parentScopeMeta = parentScopeInfo[1]
@@ -245,5 +245,5 @@ function createMemoryStack(parentStackInfo, scopeInfo, callInfo, scopeIndex) {
 }
 
 module.exports = createMemProxy
-createMemProxy.Scope = createScopeObject
+createMemProxy.Scope = createMemoryScope
 createMemProxy.Stack = createMemoryStack
