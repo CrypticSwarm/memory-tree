@@ -185,5 +185,65 @@ function createScopeObject(initialObject, parentScopeInfo) {
   return [varDiff, emitter]
 }
 
+var dummyStackInfo = [null, { getSha: function () { return "" }, setSha: function() {}, on: function () {} }]
+
+function createMemoryStack(parentStackInfo, scopeInfo, callInfo, scopeIndex) {
+  var emitter = new EventEmitter()
+  parentStackInfo = parentStackInfo || dummyStackInfo
+  var parentStack = parentStackInfo[0]
+  var parentStackMeta = parentStackInfo[1]
+  var scope = scopeInfo[0]
+  var scopeMeta = scopeInfo[1]
+  var shaList = {}
+  var curSha
+  var curObj
+
+  setObject(parentStackMeta.getSha(), scopeMeta.getSha())
+  parentStackMeta.on('change', objChange)
+  scopeMeta.on('change', objChange)
+
+  function getObjSha(parent, scope) {
+    return getSha(parent + scope)
+  }
+
+  function objChange() {
+    return setObject(parentStackMeta.getSha(), scopeMeta.getSha())
+  }
+
+  function setObject(parent, scope) {
+    var sha = getObjSha(parent, scope)
+    curSha = sha
+    if (shaList[sha]) curObj = shaList[sha]
+    else {
+      curObj = { parentStack: parent, scope: scope }
+      shaList[sha] = curObj
+    }
+    emitter.emit('change', curObj, curSha)
+  }
+
+  emitter.getSha = function getSha() {
+    return curSha
+  }
+
+  emitter.setSha = function setSha(sha) {
+    if (!shaList[sha]) return false
+    curSha = sha
+    curObj = shaList[sha]
+    parentStackMeta.setSha(curObj.parentStack)
+    scopeMeta.setSha(curObj.scope)
+    emitter.emit('change', curObj, curSha)
+    return true
+  }
+
+  var stackObj = { scope: scope
+                 , caller: parentStack
+                 , callInfo: callInfo 
+                 , scopeMeta: scopeMeta
+                 }
+
+  return [stackObj, emitter]
+}
+
 module.exports = createMemProxy
 createMemProxy.Scope = createScopeObject
+createMemProxy.Stack = createMemoryStack
