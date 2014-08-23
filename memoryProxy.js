@@ -44,13 +44,13 @@ function wrapObj(parent, x) {
     },
     enumerate: function() {
       var result = []
-      for (name in curObj) { result.push(name) }
+      for (var name in curObj) { result.push(name) }
       return result
     },
     keys: function() {
       if (!emitter.viewAll) return Object.keys(curObj)
       var result = []
-      for (name in curObj) { result.push(name) }
+      for (var name in curObj) { result.push(name) }
       return result
     }
   }
