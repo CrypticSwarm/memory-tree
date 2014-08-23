@@ -1,5 +1,6 @@
 {
   "author": "Cryptic Swarm <crypticswarm@gmail.com> (http://crypticswarm.com)",
+  "private": true,
   "name": "memory-tree",
   "description": "An immutable data-structure inspired by vim's undo history.",
   "version": "0.0.1",
